@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -188,6 +188,14 @@
   .pagefoot a{color:var(--tennis-deep);text-decoration:underline;text-underline-offset:2px}
   .note-box{background:var(--chalk-2);border-radius:12px;padding:14px 16px}
 
+  .dist{display:inline-flex;align-items:center;gap:3px;font-family:var(--font-mono);font-size:.72rem;font-weight:700;color:#fff;background:var(--ink);padding:1px 7px;border-radius:99px}
+  #nearBtn{cursor:pointer}
+  .chk#nearBtn.is-on{background:#eaf6ee;border-color:#a9d8ba;color:var(--tennis-deep)}
+  .chk#nearBtn.busy{opacity:.7;pointer-events:none}
+  .nearmsg{display:none;margin:12px 2px 0;font-size:.82rem;color:var(--alert);background:#fdecea;border:1px solid #f6c9c4;border-radius:10px;padding:9px 12px}
+  .nearmsg.is-on{display:block}
+  .me{width:16px;height:16px;border-radius:50%;background:#2b7fff;border:3px solid #fff;box-shadow:0 0 0 2px #2b7fff,0 0 0 7px rgba(43,127,255,.25)}
+
   @media (max-width:720px){
     .wrap{padding:14px 14px 56px}
     .temp__num{font-size:3.4rem}
@@ -233,8 +241,8 @@
       </div>
     </div>
     <div class="langtoggle" role="group" aria-label="Language">
-      <button data-lang="zh" aria-pressed="true">中文</button>
-      <button data-lang="en" aria-pressed="false">EN</button>
+      <button data-lang="zh" aria-pressed="false">中文</button>
+      <button data-lang="en" aria-pressed="true">EN</button>
     </div>
   </div>
 </header>
@@ -265,7 +273,9 @@
         <input class="search" id="search" type="search" autocomplete="off" placeholder="">
       </div>
       <label class="chk" id="indoorChk"><input type="checkbox" id="indoorOnly"><span data-i="fIndoor"></span></label>
+      <button class="chk" id="nearBtn" type="button"><svg aria-hidden="true" style="width:16px;height:16px"><use href="#i-pin"/></svg><span id="nearLbl"></span></button>
     </div>
+    <p class="nearmsg" id="nearMsg" role="status"></p>
   </section>
 
   <div id="map"></div>
@@ -291,7 +301,7 @@
 
 <script>
 /* ===================== i18n ===================== */
-let lang = "zh";
+let lang = "en";
 const UI = {
   zh:{
     brandTitle:"Ten & Pick",
@@ -303,6 +313,9 @@ const UI = {
     cityAll:"全部城市", searchPh:"搜尋場地名稱…",
     legTennis:"網球", legBoth:"兩者皆有", legIndoor:"室內",
     result:(n)=>`喺地圖同下方顯示 ${n} 個場地`,
+    nearBtn:"用最近排序", nearLocating:"定位緊…", nearHeading:"離你最近", youHere:"你喺呢度",
+    nearErr:"攞唔到你嘅位置 —— 請允許瀏覽器定位再試（喺 https 網站上會 work；直接開檔案有機會畀瀏覽器擋）。",
+    distKm:(d)=>`${d} km`, distM:(d)=>`${d} m`, away:"離你",
     days:["今日","聽日","後日"],
     tTennis:"網球", pPickle:"Pickleball", noPickle:"無官方 Pickleball", indoor:"室內",
     rPark:"泊車", rPrice:"收費", rWC:"洗手間", rHours:"開放時間", rShare:"場地/共用規則", rShareStar:"共用規則 ★",
@@ -325,6 +338,9 @@ const UI = {
     cityAll:"All cities", searchPh:"Search a venue name…",
     legTennis:"Tennis", legBoth:"Both", legIndoor:"Indoor",
     result:(n)=>`Showing ${n} venues on the map & below`,
+    nearBtn:"Nearest first", nearLocating:"Locating…", nearHeading:"Nearest to you", youHere:"You are here",
+    nearErr:"Couldn't get your location — allow location access and try again (works on the hosted https site; opening the file directly may be blocked by the browser).",
+    distKm:(d)=>`${d} km`, distM:(d)=>`${d} m`, away:"away",
     days:["Today","Tomorrow","Day 3"],
     tTennis:"Tennis", pPickle:"Pickleball", noPickle:"No official pickleball", indoor:"Indoor",
     rPark:"Parking", rPrice:"Price", rWC:"Washroom", rHours:"Hours", rShare:"Court / sharing rules", rShareStar:"Sharing rules ★",
@@ -624,7 +640,7 @@ function cardHTML(v){
       <div class="card__body">
         <div class="card__head"><div>
           <h3 class="card__name">${v.n}</h3>
-          <div class="card__meta"><svg aria-hidden="true"><use href="#i-pin"/></svg>${cityName(v.c)} ${starHtml(v)} ${inTag}</div>
+          <div class="card__meta"><svg aria-hidden="true"><use href="#i-pin"/></svg>${cityName(v.c)} ${starHtml(v)} ${inTag} ${distHtml(v)}</div>
         </div>${diagram(v.s)}</div>
         <p class="card__intro">${tx(v.intro)}</p>
         <div class="badges">${badges}</div>
@@ -648,7 +664,7 @@ function cardHTML(v){
     <div class="card__body">
       <div class="card__head"><div>
         <h3 class="card__name">${v.n}</h3>
-        <div class="card__meta"><svg aria-hidden="true"><use href="#i-pin"/></svg>${cityName(v.c)} ${starHtml(v)} ${inTag}</div>
+        <div class="card__meta"><svg aria-hidden="true"><use href="#i-pin"/></svg>${cityName(v.c)} ${starHtml(v)} ${inTag} ${distHtml(v)}</div>
       </div>${diagram(v.s)}</div>
       <div class="badges" style="margin:10px 0 8px">${badges}</div>
       <p class="card__note">${tx(v.note)}</p>
@@ -663,6 +679,10 @@ function cardHTML(v){
 
 /* ---- state ---- */
 let sport="all", city="all", indoorOnly=false, query="";
+let userLoc=null, sortMode="city", locating=false;
+function haversine(la1,lo1,la2,lo2){const R=6371,toR=Math.PI/180;const dLa=(la2-la1)*toR,dLo=(lo2-lo1)*toR;const a=Math.sin(dLa/2)**2+Math.cos(la1*toR)*Math.cos(la2*toR)*Math.sin(dLo/2)**2;return 2*R*Math.asin(Math.sqrt(a));}
+function fmtDist(km){return km<1?t("distM")(Math.round(km*1000)):t("distKm")(km.toFixed(1));}
+function distHtml(v){return v._dist!=null?`<span class="dist"><svg aria-hidden="true" style="width:11px;height:11px"><use href="#i-pin"/></svg>${fmtDist(v._dist)}</span>`:"";}
 function matches(v){
   if(sport==="tennis" && !hasT(v)) return false;
   if(sport==="pickleball" && !hasP(v)) return false;
@@ -677,7 +697,14 @@ const listEl=document.getElementById("list");
 function renderList(){
   const shown=VENUES.filter(matches);
   document.getElementById("resultCount").textContent=t("result")(shown.length);
+  VENUES.forEach(v=>v._dist=null);
   if(!shown.length){ listEl.innerHTML=`<p class="empty">${t("empty")}</p>`; return; }
+  if(sortMode==="distance" && userLoc){
+    shown.forEach(v=>v._dist=haversine(userLoc.lat,userLoc.lng,v.lat,v.lng));
+    const sorted=shown.slice().sort((a,b)=>a._dist-b._dist);
+    listEl.innerHTML=`<div class="city-h"><h2>${t("nearHeading")}</h2><span class="n">${sorted.length}</span></div><div class="grid">${sorted.map(cardHTML).join("")}</div>`;
+    return;
+  }
   let html="";
   CITY_ORDER.forEach(c=>{
     const inCity=shown.filter(v=>v.c===c);
@@ -705,13 +732,24 @@ function popHTML(v){
     <div class="pop__btns"><a class="prim" href="${dirUrl(v)}" target="_blank" rel="noopener">${t("dir")}</a>
     <button onclick="goCard('${v._id}')">${t("details")}</button></div></div>`;
 }
+let userMarker=null;
+function setUserOnMap(){
+  if(!map||!userLoc) return;
+  if(userMarker){ userMarker.remove(); userMarker=null; }
+  userMarker=L.marker([userLoc.lat,userLoc.lng],{icon:L.divIcon({className:"",html:'<div class="me"></div>',iconSize:[16,16],iconAnchor:[8,8]}),title:t("youHere"),zIndexOffset:1000}).addTo(map);
+}
 function renderMap(){
   if(!map) return;
   markerLayer.clearLayers();
   const shown=VENUES.filter(matches);
   const pts=[];
   shown.forEach(v=>{ const m=L.marker([v.lat,v.lng],{icon:pinIcon(v),title:v.n}); m.bindPopup(popHTML(v)); m.addTo(markerLayer); pts.push([v.lat,v.lng]); });
-  if(pts.length){ map.fitBounds(pts,{padding:[40,40],maxZoom:14}); }
+  setUserOnMap();
+  if(userLoc && sortMode==="distance"){
+    const near=shown.map(v=>[haversine(userLoc.lat,userLoc.lng,v.lat,v.lng),[v.lat,v.lng]]).sort((a,b)=>a[0]-b[0]).slice(0,8).map(x=>x[1]);
+    const b=[[userLoc.lat,userLoc.lng]].concat(near);
+    if(b.length>1) map.fitBounds(b,{padding:[50,50],maxZoom:15}); else map.setView([userLoc.lat,userLoc.lng],13);
+  } else if(pts.length){ map.fitBounds(pts,{padding:[40,40],maxZoom:14}); }
 }
 window.goCard=function(id){
   const el=document.getElementById("card-"+id);
@@ -738,12 +776,39 @@ document.getElementById("search").addEventListener("input",e=>{ query=e.target.v
 const indoorChk=document.getElementById("indoorChk");
 document.getElementById("indoorOnly").addEventListener("change",e=>{ indoorOnly=e.target.checked; indoorChk.classList.toggle("is-on",indoorOnly); refresh(); });
 
+/* ---- nearest-first (GPS) ---- */
+const nearBtn=document.getElementById("nearBtn"), nearMsg=document.getElementById("nearMsg");
+function updateNearBtn(){
+  const lbl=document.getElementById("nearLbl"); if(lbl) lbl.textContent = locating ? t("nearLocating") : t("nearBtn");
+  nearBtn.classList.toggle("is-on", sortMode==="distance");
+  nearBtn.classList.toggle("busy", locating);
+}
+function showNearMsg(on){ nearMsg.textContent = on ? t("nearErr") : ""; nearMsg.classList.toggle("is-on", !!on); }
+function requestLocation(){
+  showNearMsg(false);
+  if(!navigator.geolocation){ showNearMsg(true); return; }
+  locating=true; updateNearBtn();
+  navigator.geolocation.getCurrentPosition(
+    (pos)=>{ userLoc={lat:pos.coords.latitude,lng:pos.coords.longitude}; locating=false; sortMode="distance"; updateNearBtn(); refresh(); },
+    ()=>{ locating=false; sortMode="city"; updateNearBtn(); showNearMsg(true); refresh(); },
+    {enableHighAccuracy:true, timeout:10000, maximumAge:60000}
+  );
+}
+nearBtn.addEventListener("click",()=>{
+  if(sortMode==="distance"){ sortMode="city"; updateNearBtn(); refresh(); return; }
+  showNearMsg(false);
+  if(userLoc){ sortMode="distance"; updateNearBtn(); refresh(); }
+  else requestLocation();
+});
+
 /* ---- language ---- */
 function applyLang(){
   document.documentElement.lang = lang==="zh"?"zh-Hant":"en";
   document.querySelectorAll("[data-i]").forEach(el=>{ const k=el.getAttribute("data-i"); if(UI[lang][k]!=null) el.textContent=UI[lang][k]; });
   document.getElementById("search").placeholder=t("searchPh");
   buildCityFilter();
+  updateNearBtn();
+  if(nearMsg.classList.contains("is-on")) nearMsg.textContent=t("nearErr");
   refresh();
   if(window._wx) document.getElementById("board-content").innerHTML=weatherHTML(window._wx);
 }
