@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Metro Vancouver 網球 × Pickleball 場地互動指南</title>
+<title>Ten &amp; Pick — Metro Vancouver Courts</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -294,7 +294,7 @@
 let lang = "zh";
 const UI = {
   zh:{
-    brandTitle:"Metro Vancouver 網球 × Pickleball 場地指南",
+    brandTitle:"Ten & Pick",
     wLoading:"正在抓取溫哥華即時天氣…",
     wErr:"天氣資料暫時載入唔到 — 可能係網絡問題。", wRetry:"重試一次",
     wLoc:"Vancouver, BC · 即時天氣", wUpd:"更新", wFeels:"體感", wRainToday:"今日降雨", wHum:"濕度", wWind:"風速", wHiLo:"今日高/低",
@@ -305,7 +305,7 @@ const UI = {
     result:(n)=>`喺地圖同下方顯示 ${n} 個場地`,
     days:["今日","聽日","後日"],
     tTennis:"網球", pPickle:"Pickleball", noPickle:"無官方 Pickleball", indoor:"室內",
-    rPark:"泊車", rWC:"洗手間", rHours:"開放時間", rShare:"場地/共用規則", rShareStar:"共用規則 ★",
+    rPark:"泊車", rPrice:"收費", rWC:"洗手間", rHours:"開放時間", rShare:"場地/共用規則", rShareStar:"共用規則 ★",
     free:"免費", paid:"收費", street:"街邊",
     book:"官方資訊/預約", gmap:"Google 地圖", dir:"路線導航", details:"詳情",
     empty:"搵唔到符合條件嘅場地，試下放寬篩選。",
@@ -316,7 +316,7 @@ const UI = {
     about3:"地圖用 OpenStreetMap + Leaflet；即時天氣由 Open-Meteo 免金鑰 API 提供。本頁僅供參考，落場請自行評估安全。"
   },
   en:{
-    brandTitle:"Metro Vancouver Tennis × Pickleball Guide",
+    brandTitle:"Ten & Pick",
     wLoading:"Fetching live Vancouver weather…",
     wErr:"Couldn't load weather right now — possibly a network issue.", wRetry:"Try again",
     wLoc:"Vancouver, BC · Live weather", wUpd:"Updated", wFeels:"Feels like", wRainToday:"Rain today", wHum:"Humidity", wWind:"Wind", wHiLo:"Today H/L",
@@ -327,7 +327,7 @@ const UI = {
     result:(n)=>`Showing ${n} venues on the map & below`,
     days:["Today","Tomorrow","Day 3"],
     tTennis:"Tennis", pPickle:"Pickleball", noPickle:"No official pickleball", indoor:"Indoor",
-    rPark:"Parking", rWC:"Washroom", rHours:"Hours", rShare:"Court / sharing rules", rShareStar:"Sharing rules ★",
+    rPark:"Parking", rPrice:"Price", rWC:"Washroom", rHours:"Hours", rShare:"Court / sharing rules", rShareStar:"Sharing rules ★",
     free:"Free", paid:"Paid", street:"Street",
     book:"Official / book", gmap:"Google Maps", dir:"Directions", details:"Details",
     empty:"No venues match — try loosening the filters.",
@@ -415,6 +415,7 @@ const FULL = [
     intro:{zh:"全年室內網球，落雨／冬天首選。公眾設施、無需會籍，但要預約付費。", en:"Year-round indoor tennis — the rainy-day / winter pick. Public, no membership needed, but pay-to-book."},
     tennis:{n:16, tag:{zh:"室內 16 + 室外 1", en:"16 indoor + 1 outdoor"}}, pickle:null,
     parking:"paid", parkingTxt:{zh:"Thunderbird Parkade／East Mall 收費咪錶", en:"Thunderbird Parkade / metered East Mall"},
+    price:{zh:"室內按鐘付費、無需會籍；網上預約（旺時段較貴，價錢以官網為準）", en:"Indoor pay-to-book by the hour, no membership; book online (peak slots pricier — see official site)"},
     wc:{zh:"有，設更衣室", en:"Yes, with change rooms"},
     hours:{zh:"約 9am–10pm（部分日子有變）", en:"~9am–10pm (some days vary)"},
     share:{star:false, txt:{zh:"室內硬地，需預約付費；非會員都可訂。落雨天最穩陣嘅選擇之一。", en:"Indoor hard courts, paid booking; non-members can book. One of the safest rainy-day options."}},
@@ -542,7 +543,17 @@ const BASIC = [
   B("Delta Secondary Courts","Delta","t",49.0869,-123.0840,4.0,false,"Ladner 中學網球場，放學後／週末多數開放。","Ladner high-school courts; usually open after school / weekends."),
   B("Dennison Park","Delta","p",49.0169,-123.0783,4.2,false,"Tsawwassen 戶外 pickleball：日間約 4 個公眾場，仲有 disc golf、turf 場。","Tsawwassen outdoor pickleball: ~4 public courts by day, plus disc golf & turf field."),
   // Langley
-  B("The Tennis Centre — Langley","Langley","t",49.1487,-122.6516,4.5,true,"室內網球場，乾淨、泊車多；旺季（冬／春）夜晚好難訂。","Indoor courts, clean with ample parking; hard to book evenings in peak season.")
+  B("The Tennis Centre — Langley","Langley","t",49.1487,-122.6516,4.5,true,"室內網球場，乾淨、泊車多；旺季（冬／春）夜晚好難訂。","Indoor courts, clean with ample parking; hard to book evenings in peak season."),
+  // ── 第三批：街坊／住宅區場 ──
+  // Burnaby
+  B("Central Park Public Tennis Courts","Burnaby","t",49.2262,-123.0132,4.4,false,"南本拿比旗艦：12 個公眾網球場、練習牆同夜燈，旁邊有洗手間；週末／長假好逼。","South Burnaby flagship: 12 public courts, wall & lights, washroom nearby; packed on weekends."),
+  B("Kensington Park Tennis Courts","Burnaby","b",49.2786,-122.9765,4.6,false,"街坊場，網球場已劃埋 pickleball；泊車多，週末有時畀學校／市府預留。","Neighbourhood courts now lined for pickleball; lots of parking, sometimes reserved for schools/city on weekends."),
+  B("Willingdon Heights Park Tennis Courts","Burnaby","t",49.2734,-123.0120,4.4,false,"北本拿比 4 個網球場＋練習牆＋夜燈；秋天多落葉，記得帶掃帚。","North Burnaby: 4 courts + wall + lights; leafy in fall, bring a broom."),
+  B("Squint Lake Park","Burnaby","t",49.2678,-122.9422,4.4,false,"Burnaby Mountain 近高爾夫球場，網球場連波場、遊樂場、大免費停車場同洗手間。","By Burnaby Mountain golf course: tennis courts with ball fields, playground, big free lot & washroom."),
+  // Vancouver
+  B("Connaught Park Tennis Courts","Vancouver","t",49.2627,-123.1592,4.5,false,"Kitsilano 社區公園網球場，近社區中心同冰場；免費泊車。","Kitsilano community-park courts by the rink & community centre; free parking."),
+  B("Tecumseh Park Tennis Courts","Vancouver","t",49.2297,-123.0699,4.1,false,"East Van（E 45）街坊公園網球場，寧靜；無洗手間。","East Van (E 45th) neighbourhood-park courts, quiet; no washroom."),
+  B("Trafalgar Park Tennis Courts","Vancouver","t",49.2510,-123.1624,4.4,false,"Kitsilano（W 23）社區公園網球場，連波場、遊樂場、洗手間。","Kitsilano (W 23rd) community-park courts with ball diamonds, playground & washroom.")
 ];
 
 const VENUES = FULL.concat(BASIC).map((v,i)=>{ v._id = v.id || ("v"+i); return v; });
@@ -562,6 +573,41 @@ function diagram(s){
 const mapsUrl = (v)=> "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(v.n+", "+cityName(v.c));
 const dirUrl  = (v)=> "https://www.google.com/maps/dir/?api=1&destination="+v.lat+","+v.lng;
 const starHtml = (v)=> v.r?`<span class="star">★ ${v.r.toFixed(1)}</span>`:"";
+
+/* ---- indoor venues: pricing + parking (收費／泊車) ---- */
+const IX = {
+  "Burnaby Tennis Club":{price:{zh:"室外公眾場免費；冬天充氣 bubble 室內要買時段或會籍",en:"Outdoor public courts free; winter indoor bubble needs paid time or membership"},park:{zh:"會所免費停車場",en:"Free club lot"}},
+  "IPOP — Inclusive Place of Pickleball":{price:{zh:"Drop-in 場費＋租場制（按級別，價錢以官網為準）",en:"Drop-in + court rental (by level; see official site)"},park:{zh:"Lougheed 商場大型免費停車場",en:"Large free Lougheed-mall parking"}},
+  "Richmond Tennis Club":{price:{zh:"預約付費（會員較平）；冬天有 bubble",en:"Paid booking (cheaper for members); winter bubble"},park:{zh:"會所免費停車場",en:"Free club lot"}},
+  "Tennis BC Hub @ Richmond":{price:{zh:"按鐘付費預約（會員／非會員不同價）",en:"Hourly paid booking (member / non-member rates)"},park:{zh:"Sandman 酒店後方大停車場（免費）",en:"Free lot behind the Sandman Hotel"}},
+  "Dink Pickleball Club":{price:{zh:"Drop-in／租場制（價錢以官網為準）；有拍／球專門店",en:"Drop-in / court rental (see site); paddle pro-shop"},park:{zh:"商場免費停車場（IKEA 一帶）",en:"Free plaza parking (near IKEA)"}},
+  "Pacific Pickleball":{price:{zh:"租場／drop-in；私人上層場係全市較平之一",en:"Rental / drop-in; the private upper court is among the city's cheapest"},park:{zh:"大量免費停車場",en:"Plenty of free parking"}},
+  "Zero Zero Pickleball":{price:{zh:"租場約 $25–40/hr；open play 約 $10–17",en:"Court rental ~$25–40/hr; open play ~$10–17"},park:{zh:"停車位有限",en:"Limited parking"}},
+  "North Vancouver Tennis Centre":{price:{zh:"室內按鐘付費預約（會員／非會員不同價）",en:"Indoor hourly paid booking (member / non-member rates)"},park:{zh:"中心免費停車場",en:"Free centre parking"}},
+  "Fairgrounds Racket Club — Capilano":{price:{zh:"租場約 $60/hr；拍租約 $10/hr",en:"Court ~$60/hr; paddle rental ~$10/hr"},park:{zh:"大量免費停車場",en:"Plenty of free parking"}},
+  "Parkgate Community Centre":{price:{zh:"社區中心 drop-in 場費（以官網為準）",en:"Community-centre drop-in fee (see site)"},park:{zh:"中心免費停車場",en:"Free centre parking"}},
+  "West Vancouver Community Centre":{price:{zh:"社區中心 drop-in 場費",en:"Community-centre drop-in fee"},park:{zh:"中心收費／街邊泊車",en:"Paid centre lot / street parking"}},
+  "Gleneagles Community Centre":{price:{zh:"社區中心 drop-in 場費",en:"Community-centre drop-in fee"},park:{zh:"中心免費停車場",en:"Free centre parking"}},
+  "New West Aquatic & Community Centre":{price:{zh:"新中心 drop-in 場費（以官網為準）",en:"New-centre drop-in fee (see site)"},park:{zh:"中心停車場（部分收費）",en:"Centre parking (some paid)"}},
+  "Queen's Park Sportsplex":{price:{zh:"場館 drop-in／租場費",en:"Drop-in / rental fee"},park:{zh:"Queen's Park 免費停車場",en:"Free Queen's Park lot"}},
+  "The Tennis Centre — Coquitlam":{price:{zh:"室內按鐘付費（價錢合理）；2 個室外場免費",en:"Indoor hourly (fair rates); 2 outdoor courts free"},park:{zh:"大量免費停車場",en:"Plenty of free parking"}},
+  "Hyde Creek Recreation Centre":{price:{zh:"康樂中心 drop-in 場費（成人約 $6，以官網為準）",en:"Rec-centre drop-in (~$6 adult; see site)"},park:{zh:"中心免費停車場（樹下小心跌枝）",en:"Free centre lot (watch for falling branches)"}},
+  "The Tennis Centre — Surrey":{price:{zh:"Pay-as-you-play 按鐘付費、無會籍；online 預約",en:"Pay-as-you-play hourly, no membership; book online"},park:{zh:"免費停車場",en:"Free parking"}},
+  "IPOP Surrey":{price:{zh:"Drop-in 場費＋租場制（價錢以官網為準）",en:"Drop-in + court rental (see site)"},park:{zh:"大型免費停車場",en:"Large free lot"}},
+  "West Coast Pickleball":{price:{zh:"租場制，價錢合理（睇官網預約）",en:"Court rental, reasonable rates (book on site)"},park:{zh:"單位前停車場（位較緊）",en:"Parking out front (a bit tight)"}},
+  "Timms Community Centre":{price:{zh:"社區中心 pickleball drop-in／課程費",en:"Community-centre pickleball drop-in / class fee"},park:{zh:"中心停車場",en:"Centre parking"}},
+  "Urban Tennis":{price:{zh:"按鐘租場（連自動發球機），價錢以官網為準",en:"Hourly court (with ball machine); see site for rates"},park:{zh:"單位前停車場",en:"Parking out front"}},
+  "The Tennis Centre — Langley":{price:{zh:"室內按鐘付費；旺季夜晚會員優先",en:"Indoor hourly; members get priority on peak evenings"},park:{zh:"大量免費停車場",en:"Plenty of free parking"}}
+};
+function infoIndoor(v){
+  const x=IX[v.n]||{};
+  const price=x.price||{zh:"室內場，需付費預約（按鐘／drop-in，價錢以官網為準）",en:"Indoor — paid booking (hourly / drop-in; see official site)"};
+  const park=x.park||{zh:"設有停車場（詳情以場地為準）",en:"Parking on site (varies by venue)"};
+  return `<div class="info" style="margin-top:12px">
+    <div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-ticket"/></svg></div><div><div class="info__k">${t("rPrice")}</div><div class="info__v">${tx(price)}</div></div></div>
+    <div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-parking"/></svg></div><div><div class="info__k">${t("rPark")}</div><div class="info__v">${tx(park)}</div></div></div>
+  </div>`;
+}
 
 /* ---- render a card ---- */
 function cardHTML(v){
@@ -584,6 +630,7 @@ function cardHTML(v){
         <div class="badges">${badges}</div>
         <div class="rule"><div class="rule__k"><svg aria-hidden="true"><use href="#i-rules"/></svg>${v.share.star?t("rShareStar"):t("rShare")}</div>${tx(v.share.txt)}</div>
         <div class="info">
+          ${v.price?`<div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-ticket"/></svg></div><div><div class="info__k">${t("rPrice")}</div><div class="info__v">${tx(v.price)}</div></div></div>`:""}
           <div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-parking"/></svg></div><div><div class="info__k">${t("rPark")}${pkPill}</div><div class="info__v">${tx(v.parkingTxt)}</div></div></div>
           <div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-wc"/></svg></div><div><div class="info__k">${t("rWC")}</div><div class="info__v">${tx(v.wc)}</div></div></div>
           <div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-clock"/></svg></div><div><div class="info__k">${t("rHours")}</div><div class="info__v">${tx(v.hours)}</div></div></div>
@@ -605,6 +652,7 @@ function cardHTML(v){
       </div>${diagram(v.s)}</div>
       <div class="badges" style="margin:10px 0 8px">${badges}</div>
       <p class="card__note">${tx(v.note)}</p>
+      ${v.indoor?infoIndoor(v):""}
     </div>
     <div class="card__foot"><div class="foot-2">
       <a class="cta cta--ghost" href="${mapsUrl(v)}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-map"/></svg>${t("gmap")}</a>
