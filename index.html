@@ -316,7 +316,7 @@ const UI = {
     result:(n)=>`喺地圖同下方顯示 ${n} 個場地`,
     nearBtn:"用最近排序", nearLocating:"定位緊…", nearHeading:"離你最近", youHere:"你喺呢度",
     nearErr:"用唔到 GPS——定位要喺 https 網站（或 localhost）先 work，直接開檔案多數會畀瀏覽器擋。你可以喺下面個餐單揀返你個地區，或者直接喺地圖㩒一下設定你嘅位置。",
-    areaPlaceholder:"📍 用地區計距離…", tapHint:"喺地圖㩒一下設定你嘅位置 →",
+    areaPlaceholder:"📍 用地區計距離…", tapHint:"喺地圖㩒一下設定你嘅位置 →", myLocation:"你嘅位置",
     distKm:(d)=>`${d} km`, distM:(d)=>`${d} m`, away:"離你",
     days:["今日","聽日","後日"],
     tTennis:"網球", pPickle:"Pickleball", noPickle:"無官方 Pickleball", indoor:"室內",
@@ -342,7 +342,7 @@ const UI = {
     result:(n)=>`Showing ${n} venues on the map & below`,
     nearBtn:"Nearest first", nearLocating:"Locating…", nearHeading:"Nearest to you", youHere:"You are here",
     nearErr:"Can't use GPS — location needs the hosted https site (or localhost); opening the file directly is usually blocked. Pick your area from the menu below, or tap the map to set your location.",
-    areaPlaceholder:"📍 Set my area…", tapHint:"Tap the map to set your location →",
+    areaPlaceholder:"📍 Set my area…", tapHint:"Tap the map to set your location →", myLocation:"Your location",
     distKm:(d)=>`${d} km`, distM:(d)=>`${d} m`, away:"away",
     days:["Today","Tomorrow","Day 3"],
     tTennis:"Tennis", pPickle:"Pickleball", noPickle:"No official pickleball", indoor:"Indoor",
@@ -815,7 +815,7 @@ function updateNearBtn(){
   nearBtn.classList.toggle("busy", locating);
 }
 function showNearMsg(on){ nearMsg.textContent = on ? t("nearErr") : ""; nearMsg.classList.toggle("is-on", !!on); }
-function setUserLoc(la,lo){ userLoc={lat:la,lng:lo}; locating=false; sortMode="distance"; setPickMode(false); showNearMsg(false); updateNearBtn(); refresh(); }
+function setUserLoc(la,lo,label){ userLoc={lat:la,lng:lo}; locating=false; sortMode="distance"; setPickMode(false); showNearMsg(false); updateNearBtn(); refresh(); loadWeather(la,lo,label==null?"mine":label); }
 function requestLocation(){
   showNearMsg(false);
   if(!navigator.geolocation){ showNearMsg(true); setPickMode(true); return; }
@@ -834,7 +834,9 @@ nearBtn.addEventListener("click",()=>{
 });
 document.getElementById("areaPick").addEventListener("change",(e)=>{
   const v=e.target.value; if(!v) return;
-  const p=v.split(",").map(Number); setUserLoc(p[0],p[1]);
+  const p=v.split(",").map(Number);
+  const a=AREAS.find(x=>x.lat===p[0]&&x.lng===p[1]);
+  setUserLoc(p[0],p[1], a||e.target.selectedOptions[0].textContent);
 });
 
 /* ---- language ---- */
@@ -858,6 +860,13 @@ const VAN={lat:49.2827,lng:-123.1207};
 const WMO={0:{t:{zh:"天晴",en:"Clear"},e:"☀️"},1:{t:{zh:"大致天晴",en:"Mainly clear"},e:"🌤️"},2:{t:{zh:"部分多雲",en:"Partly cloudy"},e:"⛅"},3:{t:{zh:"多雲/陰天",en:"Overcast"},e:"☁️"},45:{t:{zh:"有霧",en:"Fog"},e:"🌫️"},48:{t:{zh:"凍霧",en:"Rime fog"},e:"🌫️"},51:{t:{zh:"毛毛雨",en:"Light drizzle"},e:"🌦️",rain:1},53:{t:{zh:"毛毛雨",en:"Drizzle"},e:"🌦️",rain:1},55:{t:{zh:"密毛雨",en:"Dense drizzle"},e:"🌧️",rain:1},56:{t:{zh:"凍毛雨",en:"Freezing drizzle"},e:"🌧️",rain:1},57:{t:{zh:"凍毛雨",en:"Freezing drizzle"},e:"🌧️",rain:1},61:{t:{zh:"小雨",en:"Light rain"},e:"🌦️",rain:1},63:{t:{zh:"中雨",en:"Rain"},e:"🌧️",rain:1},65:{t:{zh:"大雨",en:"Heavy rain"},e:"🌧️",rain:1},66:{t:{zh:"凍雨",en:"Freezing rain"},e:"🌧️",rain:1},67:{t:{zh:"凍雨",en:"Freezing rain"},e:"🌧️",rain:1},71:{t:{zh:"小雪",en:"Light snow"},e:"🌨️"},73:{t:{zh:"中雪",en:"Snow"},e:"🌨️"},75:{t:{zh:"大雪",en:"Heavy snow"},e:"❄️"},77:{t:{zh:"雪粒",en:"Snow grains"},e:"🌨️"},80:{t:{zh:"陣雨",en:"Showers"},e:"🌦️",rain:1},81:{t:{zh:"陣雨",en:"Showers"},e:"🌧️",rain:1},82:{t:{zh:"狂風大陣雨",en:"Violent showers"},e:"⛈️",rain:1},85:{t:{zh:"陣雪",en:"Snow showers"},e:"🌨️"},86:{t:{zh:"大陣雪",en:"Snow showers"},e:"❄️"},95:{t:{zh:"雷暴",en:"Thunderstorm"},e:"⛈️",rain:1},96:{t:{zh:"雷暴夾冰雹",en:"Thunderstorm, hail"},e:"⛈️",rain:1},99:{t:{zh:"雷暴夾冰雹",en:"Thunderstorm, hail"},e:"⛈️",rain:1}};
 const wmo=(c)=>WMO[c]||{t:{zh:"—",en:"—"},e:"🌡️"};
 
+function wxLabelText(){
+  const L=window._wxLabel;
+  if(L==null) return t("wLoc");
+  if(typeof L==="object") return tx(L);
+  if(L==="mine") return t("myLocation");
+  return String(L);
+}
 function weatherHTML(d){
   const cur=d.current, day=d.daily, w=wmo(cur.weather_code);
   const temp=Math.round(cur.temperature_2m), feels=Math.round(cur.apparent_temperature);
@@ -868,7 +877,7 @@ function weatherHTML(d){
   const fc=day.time.slice(0,3).map((iso,i)=>{const ww=wmo(day.weather_code[i]);const dh=Math.round(day.temperature_2m_max[i]),dl=Math.round(day.temperature_2m_min[i]),rp=day.precipitation_probability_max?.[i]??"—";
     return `<div class="fc"><div class="fc__day">${t("days")[i]}</div><div class="fc__emoji">${ww.e}</div><div class="fc__hl">${dh}°<span class="lo"> / ${dl}°</span></div><div class="fc__rain"><svg aria-hidden="true"><use href="#i-rainprob"/></svg>${rp}%</div></div>`;}).join("");
   return `<div class="board__in">
-    <div class="board__head"><div class="board__loc"><svg aria-hidden="true"><use href="#i-pin"/></svg>${t("wLoc")}</div><div class="board__updated">${t("wUpd")} ${updated}</div></div>
+    <div class="board__head"><div class="board__loc"><svg aria-hidden="true"><use href="#i-pin"/></svg>${wxLabelText()}</div><div class="board__updated">${t("wUpd")} ${updated}</div></div>
     <div class="board__main"><div class="temp"><span class="temp__num">${temp}</span><span class="temp__unit">°C</span></div>
       <div class="cond"><span class="cond__emoji">${w.e}</span><span><span class="cond__label">${tx(w.t)}</span><br><span class="cond__feels">${t("wFeels")} ${feels}°C</span></span></div></div>
     <div class="stats">
@@ -880,9 +889,11 @@ function weatherHTML(d){
     <div class="wet ${isWet?'is-on':''}" role="alert"><svg aria-hidden="true"><use href="#i-warn"/></svg><div><div class="wet__t">${t("wetT")}</div><div class="wet__d">${t("wetD")}</div></div></div>
     <div class="forecast">${fc}</div></div>`;
 }
-async function loadWeather(){
+async function loadWeather(lat, lng, label){
+  if(lat==null){ lat=VAN.lat; lng=VAN.lng; label=null; }
+  window._wxReq={lat,lng,label}; window._wxLabel=label;
   document.getElementById("board-content").innerHTML=`<div class="board__msg"><span class="spin"></span>${t("wLoading")}</div>`;
-  const url="https://api.open-meteo.com/v1/forecast?latitude="+VAN.lat+"&longitude="+VAN.lng+"&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,showers,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=America%2FVancouver&forecast_days=3";
+  const url="https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lng+"&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,rain,showers,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=3";
   try{
     const res=await fetch(url); if(!res.ok) throw new Error("HTTP "+res.status);
     const data=await res.json(); if(!data.current||!data.daily) throw new Error("bad payload");
@@ -890,7 +901,7 @@ async function loadWeather(){
   }catch(err){
     console.error("weather failed:",err);
     document.getElementById("board-content").innerHTML=`<div class="board__msg">${t("wErr")}<br><button class="retry" id="retryW">${t("wRetry")}</button></div>`;
-    document.getElementById("retryW").addEventListener("click",loadWeather);
+    document.getElementById("retryW").addEventListener("click",()=>{ const r=window._wxReq||{}; loadWeather(r.lat,r.lng,r.label); });
   }
 }
 
