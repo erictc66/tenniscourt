@@ -274,6 +274,7 @@
       </div>
       <label class="chk" id="indoorChk"><input type="checkbox" id="indoorOnly"><span data-i="fIndoor"></span></label>
       <button class="chk" id="nearBtn" type="button"><svg aria-hidden="true" style="width:16px;height:16px"><use href="#i-pin"/></svg><span id="nearLbl"></span></button>
+      <div class="field"><select id="areaPick" aria-label="Set my area"></select></div>
     </div>
     <p class="nearmsg" id="nearMsg" role="status"></p>
   </section>
@@ -314,7 +315,8 @@ const UI = {
     legTennis:"網球", legBoth:"兩者皆有", legIndoor:"室內",
     result:(n)=>`喺地圖同下方顯示 ${n} 個場地`,
     nearBtn:"用最近排序", nearLocating:"定位緊…", nearHeading:"離你最近", youHere:"你喺呢度",
-    nearErr:"攞唔到你嘅位置 —— 請允許瀏覽器定位再試（喺 https 網站上會 work；直接開檔案有機會畀瀏覽器擋）。",
+    nearErr:"用唔到 GPS——定位要喺 https 網站（或 localhost）先 work，直接開檔案多數會畀瀏覽器擋。你可以喺下面個餐單揀返你個地區，或者直接喺地圖㩒一下設定你嘅位置。",
+    areaPlaceholder:"📍 用地區計距離…", tapHint:"喺地圖㩒一下設定你嘅位置 →",
     distKm:(d)=>`${d} km`, distM:(d)=>`${d} m`, away:"離你",
     days:["今日","聽日","後日"],
     tTennis:"網球", pPickle:"Pickleball", noPickle:"無官方 Pickleball", indoor:"室內",
@@ -339,7 +341,8 @@ const UI = {
     legTennis:"Tennis", legBoth:"Both", legIndoor:"Indoor",
     result:(n)=>`Showing ${n} venues on the map & below`,
     nearBtn:"Nearest first", nearLocating:"Locating…", nearHeading:"Nearest to you", youHere:"You are here",
-    nearErr:"Couldn't get your location — allow location access and try again (works on the hosted https site; opening the file directly may be blocked by the browser).",
+    nearErr:"Can't use GPS — location needs the hosted https site (or localhost); opening the file directly is usually blocked. Pick your area from the menu below, or tap the map to set your location.",
+    areaPlaceholder:"📍 Set my area…", tapHint:"Tap the map to set your location →",
     distKm:(d)=>`${d} km`, distM:(d)=>`${d} m`, away:"away",
     days:["Today","Tomorrow","Day 3"],
     tTennis:"Tennis", pPickle:"Pickleball", noPickle:"No official pickleball", indoor:"Indoor",
@@ -776,29 +779,62 @@ document.getElementById("search").addEventListener("input",e=>{ query=e.target.v
 const indoorChk=document.getElementById("indoorChk");
 document.getElementById("indoorOnly").addEventListener("change",e=>{ indoorOnly=e.target.checked; indoorChk.classList.toggle("is-on",indoorOnly); refresh(); });
 
-/* ---- nearest-first (GPS) ---- */
+/* ---- nearest-first: GPS + manual fallbacks (area menu / tap map) ---- */
+const AREAS=[
+  {zh:"溫哥華市中心",en:"Downtown Vancouver",lat:49.2820,lng:-123.1190},
+  {zh:"Kitsilano／西區",en:"Kitsilano / West Side",lat:49.2660,lng:-123.1660},
+  {zh:"東溫哥華",en:"East Vancouver",lat:49.2510,lng:-123.0700},
+  {zh:"UBC",en:"UBC",lat:49.2606,lng:-123.2460},
+  {zh:"本拿比 Metrotown",en:"Burnaby — Metrotown",lat:49.2270,lng:-122.9990},
+  {zh:"本拿比 Lougheed",en:"Burnaby — Lougheed",lat:49.2490,lng:-122.8960},
+  {zh:"列治文市中心",en:"Richmond Centre",lat:49.1670,lng:-123.1360},
+  {zh:"北溫",en:"North Vancouver",lat:49.3200,lng:-123.0700},
+  {zh:"西溫",en:"West Vancouver",lat:49.3290,lng:-123.1600},
+  {zh:"新西敏",en:"New Westminster",lat:49.2060,lng:-122.9110},
+  {zh:"高貴林市中心",en:"Coquitlam Centre",lat:49.2780,lng:-122.7960},
+  {zh:"高貴林港 PoCo",en:"Port Coquitlam",lat:49.2620,lng:-122.7810},
+  {zh:"滿地寶",en:"Port Moody",lat:49.2830,lng:-122.8310},
+  {zh:"素里中心",en:"Surrey — Central",lat:49.1890,lng:-122.8460},
+  {zh:"三角洲 Ladner",en:"Delta — Ladner",lat:49.0900,lng:-123.0820},
+  {zh:"楚瓦森",en:"Tsawwassen",lat:49.0110,lng:-123.0840},
+  {zh:"蘭里",en:"Langley",lat:49.1040,lng:-122.6600}
+];
 const nearBtn=document.getElementById("nearBtn"), nearMsg=document.getElementById("nearMsg");
+let pickMode=false;
+function setPickMode(on){ pickMode=on; if(map) map.getContainer().style.cursor = on?"crosshair":""; }
+function buildAreaPicker(){
+  const sel=document.getElementById("areaPick"); if(!sel) return;
+  const cur=sel.value;
+  let o=`<option value="">${t("areaPlaceholder")}</option>`;
+  AREAS.forEach(a=>{ o+=`<option value="${a.lat},${a.lng}">${tx(a)}</option>`; });
+  sel.innerHTML=o; sel.value=cur;
+}
 function updateNearBtn(){
   const lbl=document.getElementById("nearLbl"); if(lbl) lbl.textContent = locating ? t("nearLocating") : t("nearBtn");
   nearBtn.classList.toggle("is-on", sortMode==="distance");
   nearBtn.classList.toggle("busy", locating);
 }
 function showNearMsg(on){ nearMsg.textContent = on ? t("nearErr") : ""; nearMsg.classList.toggle("is-on", !!on); }
+function setUserLoc(la,lo){ userLoc={lat:la,lng:lo}; locating=false; sortMode="distance"; setPickMode(false); showNearMsg(false); updateNearBtn(); refresh(); }
 function requestLocation(){
   showNearMsg(false);
-  if(!navigator.geolocation){ showNearMsg(true); return; }
+  if(!navigator.geolocation){ showNearMsg(true); setPickMode(true); return; }
   locating=true; updateNearBtn();
   navigator.geolocation.getCurrentPosition(
-    (pos)=>{ userLoc={lat:pos.coords.latitude,lng:pos.coords.longitude}; locating=false; sortMode="distance"; updateNearBtn(); refresh(); },
-    ()=>{ locating=false; sortMode="city"; updateNearBtn(); showNearMsg(true); refresh(); },
+    (pos)=>{ setUserLoc(pos.coords.latitude,pos.coords.longitude); },
+    ()=>{ locating=false; sortMode="city"; updateNearBtn(); showNearMsg(true); setPickMode(true); refresh(); },
     {enableHighAccuracy:true, timeout:10000, maximumAge:60000}
   );
 }
 nearBtn.addEventListener("click",()=>{
-  if(sortMode==="distance"){ sortMode="city"; updateNearBtn(); refresh(); return; }
+  if(sortMode==="distance"){ sortMode="city"; setPickMode(false); updateNearBtn(); refresh(); return; }
   showNearMsg(false);
   if(userLoc){ sortMode="distance"; updateNearBtn(); refresh(); }
   else requestLocation();
+});
+document.getElementById("areaPick").addEventListener("change",(e)=>{
+  const v=e.target.value; if(!v) return;
+  const p=v.split(",").map(Number); setUserLoc(p[0],p[1]);
 });
 
 /* ---- language ---- */
@@ -807,6 +843,7 @@ function applyLang(){
   document.querySelectorAll("[data-i]").forEach(el=>{ const k=el.getAttribute("data-i"); if(UI[lang][k]!=null) el.textContent=UI[lang][k]; });
   document.getElementById("search").placeholder=t("searchPh");
   buildCityFilter();
+  buildAreaPicker();
   updateNearBtn();
   if(nearMsg.classList.contains("is-on")) nearMsg.textContent=t("nearErr");
   refresh();
@@ -865,6 +902,7 @@ window.addEventListener("load",()=>{
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
   markerLayer=L.layerGroup().addTo(map);
   renderMap();
+  map.on("click",(e)=>{ if(!pickMode) return; setUserLoc(e.latlng.lat,e.latlng.lng); });
 });
 </script>
 </body>
