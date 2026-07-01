@@ -572,7 +572,9 @@ const BASIC = [
   // Vancouver
   B("Connaught Park Tennis Courts","Vancouver","t",49.2627,-123.1592,4.5,false,"Kitsilano 社區公園網球場，近社區中心同冰場；免費泊車。","Kitsilano community-park courts by the rink & community centre; free parking."),
   B("Tecumseh Park Tennis Courts","Vancouver","t",49.2297,-123.0699,4.1,false,"East Van（E 45）街坊公園網球場，寧靜；無洗手間。","East Van (E 45th) neighbourhood-park courts, quiet; no washroom."),
-  B("Trafalgar Park Tennis Courts","Vancouver","t",49.2510,-123.1624,4.4,false,"Kitsilano（W 23）社區公園網球場，連波場、遊樂場、洗手間。","Kitsilano (W 23rd) community-park courts with ball diamonds, playground & washroom.")
+  B("Trafalgar Park Tennis Courts","Vancouver","t",49.2510,-123.1624,4.4,false,"Kitsilano（W 23）社區公園網球場，連波場、遊樂場、洗手間。","Kitsilano (W 23rd) community-park courts with ball diamonds, playground & washroom."),
+  // ── 室內練習場 ──
+  B("Vancouver International Tennis Academy","Richmond","t",49.1314,-123.0942,4.1,true,"室內網球場（River Club），可全年練習、租場；設施舊啲，非會員／非相關人士較難訂場。","Indoor courts (River Club) for year-round practice & rental; older facility, harder to book if not affiliated.")
 ];
 
 const VENUES = FULL.concat(BASIC).map((v,i)=>{ v._id = v.id || ("v"+i); return v; });
@@ -616,14 +618,42 @@ const IX = {
   "West Coast Pickleball":{price:{zh:"租場制，價錢合理（睇官網預約）",en:"Court rental, reasonable rates (book on site)"},park:{zh:"單位前停車場（位較緊）",en:"Parking out front (a bit tight)"}},
   "Timms Community Centre":{price:{zh:"社區中心 pickleball drop-in／課程費",en:"Community-centre pickleball drop-in / class fee"},park:{zh:"中心停車場",en:"Centre parking"}},
   "Urban Tennis":{price:{zh:"按鐘租場（連自動發球機），價錢以官網為準",en:"Hourly court (with ball machine); see site for rates"},park:{zh:"單位前停車場",en:"Parking out front"}},
-  "The Tennis Centre — Langley":{price:{zh:"室內按鐘付費；旺季夜晚會員優先",en:"Indoor hourly; members get priority on peak evenings"},park:{zh:"大量免費停車場",en:"Plenty of free parking"}}
+  "The Tennis Centre — Langley":{price:{zh:"室內按鐘付費；旺季夜晚會員優先",en:"Indoor hourly; members get priority on peak evenings"},park:{zh:"大量免費停車場",en:"Plenty of free parking"}},
+  "Vancouver International Tennis Academy":{price:{zh:"室內租場／訓練（按鐘，價錢以官網為準）",en:"Indoor court rental / training (hourly; see official site)"},park:{zh:"單位前免費停車場",en:"Free parking out front"}}
+};
+const IXH = {
+  "Burnaby Tennis Club":{zh:"室外全年；冬天 bubble 室內，燈到 11pm",en:"Outdoor year-round; winter bubble indoor, lights to 11pm"},
+  "IPOP — Inclusive Place of Pickleball":{zh:"每日 6:00–24:00",en:"Daily 6am–midnight"},
+  "Richmond Tennis Club":{zh:"一至五 9:00–21:00、六日 9:30–21:00",en:"Mon–Fri 9am–9pm, Sat–Sun 9:30am–9pm"},
+  "Tennis BC Hub @ Richmond":{zh:"每日 6:30–23:00",en:"Daily 6:30am–11pm"},
+  "Dink Pickleball Club":{zh:"每日約 7:00–24:00（三 8:00 開）",en:"Daily ~7am–midnight (Wed from 8am)"},
+  "Pacific Pickleball":{zh:"每日 8:00–24:00",en:"Daily 8am–midnight"},
+  "Zero Zero Pickleball":{zh:"每日 6:00–24:00",en:"Daily 6am–midnight"},
+  "North Vancouver Tennis Centre":{zh:"一二四五 7:00–21:00、六 8:00–21:00、日 8:00–19:30（三休）",en:"Mon/Tue/Thu/Fri 7am–9pm, Sat 8am–9pm, Sun 8am–7:30pm (Wed closed)"},
+  "Fairgrounds Racket Club — Capilano":{zh:"每日 8:00–22:00",en:"Daily 8am–10pm"},
+  "Parkgate Community Centre":{zh:"按中心時間表",en:"Per centre schedule"},
+  "West Vancouver Community Centre":{zh:"按中心時間表",en:"Per centre schedule"},
+  "Gleneagles Community Centre":{zh:"按中心時間表",en:"Per centre schedule"},
+  "New West Aquatic & Community Centre":{zh:"按中心時間表",en:"Per centre schedule"},
+  "Queen's Park Sportsplex":{zh:"按中心時間表",en:"Per centre schedule"},
+  "The Tennis Centre — Coquitlam":{zh:"一至四 6:00–22:00、五 6:00–23:00、六日約 7:00–22:00",en:"Mon–Thu 6am–10pm, Fri 6am–11pm, Sat–Sun ~7am–10pm"},
+  "Hyde Creek Recreation Centre":{zh:"一至五 6:00–22:00、六日 8:00–21:00",en:"Mon–Fri 6am–10pm, Sat–Sun 8am–9pm"},
+  "The Tennis Centre — Surrey":{zh:"一至五 6:00–23:00、六日 7:00–22:00",en:"Mon–Fri 6am–11pm, Sat–Sun 7am–10pm"},
+  "IPOP Surrey":{zh:"每日 6:00–24:00",en:"Daily 6am–midnight"},
+  "West Coast Pickleball":{zh:"每日 6:00–24:00",en:"Daily 6am–midnight"},
+  "Timms Community Centre":{zh:"按中心時間表",en:"Per centre schedule"},
+  "Urban Tennis":{zh:"每日 10:00–22:00",en:"Daily 10am–10pm"},
+  "The Tennis Centre — Langley":{zh:"每日 6:00–23:00",en:"Daily 6am–11pm"},
+  "Vancouver International Tennis Academy":{zh:"每日 24 小時（要預約）",en:"Open 24 hours (booking required)"}
 };
 function infoIndoor(v){
   const x=IX[v.n]||{};
   const price=x.price||{zh:"室內場，需付費預約（按鐘／drop-in，價錢以官網為準）",en:"Indoor — paid booking (hourly / drop-in; see official site)"};
   const park=x.park||{zh:"設有停車場（詳情以場地為準）",en:"Parking on site (varies by venue)"};
+  const hrs=IXH[v.n];
   return `<div class="info" style="margin-top:12px">
     <div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-ticket"/></svg></div><div><div class="info__k">${t("rPrice")}</div><div class="info__v">${tx(price)}</div></div></div>
+    ${hrs?`<div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-clock"/></svg></div><div><div class="info__k">${t("rHours")}</div><div class="info__v">${tx(hrs)}</div></div></div>`:""}
     <div class="info__row"><div class="info__ic"><svg aria-hidden="true"><use href="#i-parking"/></svg></div><div><div class="info__k">${t("rPark")}</div><div class="info__v">${tx(park)}</div></div></div>
   </div>`;
 }
