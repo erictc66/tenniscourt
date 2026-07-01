@@ -108,20 +108,21 @@
   .pin{width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 5px rgba(0,0,0,.35);display:grid;place-items:center}
   .pin i{transform:rotate(45deg);font-style:normal;font-size:11px;line-height:1;color:#fff;font-weight:800}
   .pin--t{background:var(--tennis)} .pin--p{background:var(--pickle)} .pin--b{background:conic-gradient(var(--tennis) 0 50%,var(--pickle) 0 100%)}
+  .pin--m{background:#7c3aed}
   .pin--in{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--indoor),0 2px 5px rgba(0,0,0,.35)}
   .pop{font-family:var(--font-body);min-width:180px}
   .pop__n{font-family:var(--font-display);font-weight:800;font-size:.98rem;line-height:1.2;margin-bottom:3px}
   .pop__m{font-size:.78rem;color:var(--ink-faint);margin-bottom:7px}
   .pop__tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
   .ptag{font-size:.68rem;font-weight:700;padding:2px 7px;border-radius:99px}
-  .ptag--t{background:var(--tennis-wash);color:var(--tennis-deep)} .ptag--p{background:var(--pickle-wash);color:var(--pickle-deep)} .ptag--in{background:#eef4fb;color:var(--indoor)}
+  .ptag--t{background:var(--tennis-wash);color:var(--tennis-deep)} .ptag--p{background:var(--pickle-wash);color:var(--pickle-deep)} .ptag--in{background:#eef4fb;color:var(--indoor)} .ptag--m{background:#efe7fd;color:#6d28d9}
   .pop__btns{display:flex;gap:6px}
   .pop__btns a,.pop__btns button{flex:1;text-align:center;font-size:.78rem;font-weight:700;padding:6px 8px;border-radius:8px;text-decoration:none;cursor:pointer;border:1.5px solid var(--line-strong);background:var(--card);color:var(--ink)}
   .pop__btns a.prim{background:var(--ink);color:#fff;border-color:var(--ink)}
   .map-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:.76rem;color:var(--ink-soft);margin:0 2px 16px;padding-top:2px}
   .map-leg span{display:inline-flex;align-items:center;gap:6px}
   .map-leg .d{width:11px;height:11px;border-radius:3px}
-  .map-leg .d.t{background:var(--tennis)} .map-leg .d.p{background:var(--pickle)} .map-leg .d.b{background:conic-gradient(var(--tennis) 0 50%,var(--pickle) 0 100%)} .map-leg .d.in{background:#fff;box-shadow:0 0 0 2px var(--indoor)}
+  .map-leg .d.t{background:var(--tennis)} .map-leg .d.p{background:var(--pickle)} .map-leg .d.b{background:conic-gradient(var(--tennis) 0 50%,var(--pickle) 0 100%)} .map-leg .d.in{background:#fff;box-shadow:0 0 0 2px var(--indoor)} .map-leg .d.m{background:#7c3aed}
 
   .count{font-size:.85rem;color:var(--ink-faint);font-family:var(--font-mono);margin:2px 2px 12px}
 
@@ -154,6 +155,7 @@
   .badge--t{background:var(--tennis-wash);border-color:#bfe4c9;color:var(--tennis-deep)}
   .badge--p{background:var(--pickle-wash);border-color:#f6cda6;color:var(--pickle-deep)}
   .badge--none{background:var(--chalk-2);border-color:var(--line);color:var(--ink-faint)}
+  .badge--m{background:#efe7fd;border-color:#d3c2f7;color:#6d28d9}
   .badge .qty{font-family:var(--font-mono)}
   .badge .tg{font-weight:600;opacity:.85;font-size:.72rem}
   .rule{background:#fff8ef;border:1px solid #f6dcbf;border-radius:10px;padding:9px 11px;margin-bottom:12px;font-size:.82rem;color:var(--ink-soft)}
@@ -285,6 +287,7 @@
     <span><span class="d p"></span>Pickleball</span>
     <span><span class="d b"></span><span data-i="legBoth"></span></span>
     <span><span class="d in"></span><span data-i="legIndoor"></span></span>
+    <span><span class="d m"></span><span data-i="legMachine"></span></span>
   </div>
 
   <div class="count" id="resultCount" aria-live="polite"></div>
@@ -312,7 +315,7 @@ const UI = {
     wetT:"目前溫哥華正在下雨，室外球場可能濕滑，請注意安全！", wetD:"建議改打室內場、或等場地乾透先落場；硬地濕水好易跣親。",
     fSport:"運動類型", fAll:"全部", fTennis:"網球", fIndoor:"只看室內",
     cityAll:"全部城市", searchPh:"搜尋場地名稱…",
-    legTennis:"網球", legBoth:"兩者皆有", legIndoor:"室內",
+    legTennis:"網球", legBoth:"兩者皆有", legIndoor:"室內", legMachine:"發球機／練習機", bMachine:"發球機",
     result:(n)=>`喺地圖同下方顯示 ${n} 個場地`,
     nearBtn:"用最近排序", nearLocating:"定位緊…", nearHeading:"離你最近", youHere:"你喺呢度",
     nearErr:"用唔到 GPS——定位要喺 https 網站（或 localhost）先 work，直接開檔案多數會畀瀏覽器擋。你可以喺下面個餐單揀返你個地區，或者直接喺地圖㩒一下設定你嘅位置。",
@@ -338,7 +341,7 @@ const UI = {
     wetT:"It's raining in Vancouver right now — outdoor courts may be slippery. Play safe!", wetD:"Consider indoor courts, or wait until the surface dries; wet hard courts are slick.",
     fSport:"Sport", fAll:"All", fTennis:"Tennis", fIndoor:"Indoor only",
     cityAll:"All cities", searchPh:"Search a venue name…",
-    legTennis:"Tennis", legBoth:"Both", legIndoor:"Indoor",
+    legTennis:"Tennis", legBoth:"Both", legIndoor:"Indoor", legMachine:"Ball machine", bMachine:"Ball machine",
     result:(n)=>`Showing ${n} venues on the map & below`,
     nearBtn:"Nearest first", nearLocating:"Locating…", nearHeading:"Nearest to you", youHere:"You are here",
     nearErr:"Can't use GPS — location needs the hosted https site (or localhost); opening the file directly is usually blocked. Pick your area from the menu below, or tap the map to set your location.",
@@ -574,7 +577,9 @@ const BASIC = [
   B("Tecumseh Park Tennis Courts","Vancouver","t",49.2297,-123.0699,4.1,false,"East Van（E 45）街坊公園網球場，寧靜；無洗手間。","East Van (E 45th) neighbourhood-park courts, quiet; no washroom."),
   B("Trafalgar Park Tennis Courts","Vancouver","t",49.2510,-123.1624,4.4,false,"Kitsilano（W 23）社區公園網球場，連波場、遊樂場、洗手間。","Kitsilano (W 23rd) community-park courts with ball diamonds, playground & washroom."),
   // ── 室內練習場 ──
-  B("Vancouver International Tennis Academy","Richmond","t",49.1314,-123.0942,4.1,true,"室內網球場（River Club），可全年練習、租場；設施舊啲，非會員／非相關人士較難訂場。","Indoor courts (River Club) for year-round practice & rental; older facility, harder to book if not affiliated.")
+  B("Vancouver International Tennis Academy","Richmond","t",49.1314,-123.0942,4.1,true,"室內網球場（River Club），可全年練習、租場；設施舊啲，非會員／非相關人士較難訂場。","Indoor courts (River Club) for year-round practice & rental; older facility, harder to book if not affiliated."),
+  B("UE Tennis 優逸網球學練館","Richmond","t",49.1867,-123.0744,5.0,true,"室內發球機練習場，可自己設定球速練波（雨天恩物）；啱新手，老闆／教練友善。","Indoor ball-machine practice range — set your own ball speed (great on rainy days); beginner-friendly, friendly owners."),
+  B("Tennis Go","Richmond","t",49.1294,-123.0974,5.0,true,"室內練習場，真網球場地板、可按程度自訂訓練、自己控制節奏；亦有教練同 app 搵波友。","Indoor practice facility with real court flooring, customizable training at your own pace; coaching & a match-finding app too.")
 ];
 
 const VENUES = FULL.concat(BASIC).map((v,i)=>{ v._id = v.id || ("v"+i); return v; });
@@ -619,7 +624,9 @@ const IX = {
   "Timms Community Centre":{price:{zh:"社區中心 pickleball drop-in／課程費",en:"Community-centre pickleball drop-in / class fee"},park:{zh:"中心停車場",en:"Centre parking"}},
   "Urban Tennis":{price:{zh:"按鐘租場（連自動發球機），價錢以官網為準",en:"Hourly court (with ball machine); see site for rates"},park:{zh:"單位前停車場",en:"Parking out front"}},
   "The Tennis Centre — Langley":{price:{zh:"室內按鐘付費；旺季夜晚會員優先",en:"Indoor hourly; members get priority on peak evenings"},park:{zh:"大量免費停車場",en:"Plenty of free parking"}},
-  "Vancouver International Tennis Academy":{price:{zh:"室內租場／訓練（按鐘，價錢以官網為準）",en:"Indoor court rental / training (hourly; see official site)"},park:{zh:"單位前免費停車場",en:"Free parking out front"}}
+  "Vancouver International Tennis Academy":{price:{zh:"室內租場／訓練（按鐘，價錢以官網為準）",en:"Indoor court rental / training (hourly; see official site)"},park:{zh:"單位前免費停車場",en:"Free parking out front"}},
+  "UE Tennis 優逸網球學練館":{price:{zh:"按鐘租發球機／場（價錢以官網為準）",en:"Hourly ball-machine / court rental (see official site)"},park:{zh:"單位前免費停車場",en:"Free parking out front"}},
+  "Tennis Go":{price:{zh:"按鐘租場練習（價錢以官網為準）",en:"Hourly practice-court rental (see official site)"},park:{zh:"單位前免費停車場",en:"Free parking out front"}}
 };
 const IXH = {
   "Burnaby Tennis Club":{zh:"室外全年；冬天 bubble 室內，燈到 11pm",en:"Outdoor year-round; winter bubble indoor, lights to 11pm"},
@@ -644,7 +651,9 @@ const IXH = {
   "Timms Community Centre":{zh:"按中心時間表",en:"Per centre schedule"},
   "Urban Tennis":{zh:"每日 10:00–22:00",en:"Daily 10am–10pm"},
   "The Tennis Centre — Langley":{zh:"每日 6:00–23:00",en:"Daily 6am–11pm"},
-  "Vancouver International Tennis Academy":{zh:"每日 24 小時（要預約）",en:"Open 24 hours (booking required)"}
+  "Vancouver International Tennis Academy":{zh:"每日 24 小時（要預約）",en:"Open 24 hours (booking required)"},
+  "UE Tennis 優逸網球學練館":{zh:"一二日 8:00–21:00、三至六 8:00–22:00",en:"Mon/Tue/Sun 8am–9pm, Wed–Sat 8am–10pm"},
+  "Tennis Go":{zh:"每日 7:00–22:00",en:"Daily 7am–10pm"}
 };
 function infoIndoor(v){
   const x=IX[v.n]||{};
@@ -658,6 +667,10 @@ function infoIndoor(v){
   </div>`;
 }
 
+/* ---- venues with an indoor ball machine / practice machine ---- */
+const MACHINE = new Set(["Urban Tennis","UE Tennis 優逸網球學練館","Tennis Go"]);
+function hasMachine(v){ return MACHINE.has(v.n); }
+
 /* ---- render a card ---- */
 function cardHTML(v){
   const inTag = v.indoor?`<span class="tag-in">${t("indoor")}</span>`:"";
@@ -666,6 +679,7 @@ function cardHTML(v){
     if(v.tennis) badges+=`<span class="badge badge--t"><svg aria-hidden="true"><use href="#i-racquet"/></svg>${t("tTennis")} <span class="qty">${t("courts")(v.tennis.n)}</span><span class="tg">${tx(v.tennis.tag)}</span></span>`;
     if(v.pickle) badges+=`<span class="badge badge--p"><svg aria-hidden="true"><use href="#i-paddle"/></svg>${t("pPickle")} <span class="qty">${t("courts")(v.pickle.n)}</span><span class="tg">${tx(v.pickle.tag)}</span></span>`;
     else badges+=`<span class="badge badge--none"><svg aria-hidden="true"><use href="#i-paddle"/></svg>${t("noPickle")}</span>`;
+    if(hasMachine(v)) badges+=`<span class="badge badge--m">⚙ ${t("bMachine")}</span>`;
     const pk=v.parking, pkPill=pk==="free"?`<span class="pill pill--free">${t("free")}</span>`:pk==="paid"?`<span class="pill pill--paid">${t("paid")}</span>`:`<span class="pill pill--street">${t("street")}</span>`;
     const btns=v.links.map(l=>`<a class="cta cta--${l.style}" href="${l.url}" target="_blank" rel="noopener"><svg aria-hidden="true"><use href="#i-${l.style==='ghost'?'ext':'ticket'}"/></svg>${tx(l.label)}</a>`).join("");
     return `<article class="card" id="card-${v._id}" data-t="${hasT(v)?1:0}" data-p="${hasP(v)?1:0}" data-in="${v.indoor?1:0}" data-city="${v.c}" data-name="${v.n.toLowerCase()}">
@@ -692,6 +706,7 @@ function cardHTML(v){
   let badges="";
   if(hasT(v)) badges+=`<span class="badge badge--t"><svg aria-hidden="true"><use href="#i-racquet"/></svg>${t("tTennis")}</span>`;
   if(hasP(v)) badges+=`<span class="badge badge--p"><svg aria-hidden="true"><use href="#i-paddle"/></svg>${t("pPickle")}</span>`;
+  if(hasMachine(v)) badges+=`<span class="badge badge--m">⚙ ${t("bMachine")}</span>`;
   return `<article class="card" id="card-${v._id}" data-t="${hasT(v)?1:0}" data-p="${hasP(v)?1:0}" data-in="${v.indoor?1:0}" data-city="${v.c}" data-name="${v.n.toLowerCase()}">
     <div class="card__stripe ${stripeClass(v.s)}"></div>
     <div class="card__body">
@@ -750,9 +765,10 @@ function renderList(){
 /* ---- Leaflet map ---- */
 let map, markerLayer;
 function pinIcon(v){
-  const cls=v.s==="t"?"pin--t":v.s==="p"?"pin--p":"pin--b";
+  const m=hasMachine(v);
+  const cls=m?"pin--m":(v.s==="t"?"pin--t":v.s==="p"?"pin--p":"pin--b");
   const inn=v.indoor?" pin--in":"";
-  const glyph=v.s==="p"?"P":v.s==="b"?"+":"T";
+  const glyph=m?"⚙":(v.s==="p"?"P":v.s==="b"?"+":"T");
   return L.divIcon({className:"",html:`<div class="pin ${cls}${inn}"><i>${glyph}</i></div>`,iconSize:[24,24],iconAnchor:[12,24],popupAnchor:[0,-22]});
 }
 function popHTML(v){
@@ -760,6 +776,7 @@ function popHTML(v){
   if(hasT(v)) tags+=`<span class="ptag ptag--t">${t("tTennis")}</span>`;
   if(hasP(v)) tags+=`<span class="ptag ptag--p">Pickleball</span>`;
   if(v.indoor) tags+=`<span class="ptag ptag--in">${t("indoor")}</span>`;
+  if(hasMachine(v)) tags+=`<span class="ptag ptag--m">⚙ ${t("bMachine")}</span>`;
   return `<div class="pop"><div class="pop__n">${v.n}</div><div class="pop__m">${cityName(v.c)} ${v.r?"· ★ "+v.r.toFixed(1):""}</div>
     <div class="pop__tags">${tags}</div>
     <div class="pop__btns"><a class="prim" href="${dirUrl(v)}" target="_blank" rel="noopener">${t("dir")}</a>
